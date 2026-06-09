@@ -1,0 +1,20 @@
+Zadanie
+
+a. Pobierz dane oraz dokumentację ze strony podanej przez prowadzącego.
+b. Oczyść dane z wartości niekompletnych.
+c. Zakoduj dane nienumeryczne.
+d. Znormalizuj dane, które tego wymagają.
+e. Zaprojektuj sieć neuronową. Dobierz liczbę warstw ukrytych i ich liczebność, wartość funkcji celu, funkcje przejścia, współczynnik uczenia (uzasadnij swoje decyzje).
+f. Wykonaj uczenie sieci na zbiorze treningowym.
+g. Oceń jakość klasyfikacji wykorzystując macierz pomyłek oraz współczynniki: Accuracy, Precision oraz Recall (które wielkości są najlepiej identyfikowane, które klasyfikacje są najbardziej wiarygodne).
+
+---
+
+*UWAGI!*
+
+- Rozwiązania zapisać w pliku o nazwie identycznej z nazwiskiem studenta.
+- W treści pliku zaznaczyć komentarzem, który podpunkt jest rozwiązywany.
+- Zbiór zawierający dane uczące nazwij 3 pierwszymi literami nazwiska (np.: Kowalski → Kow).
+- Zbiór zawierający wartości oczekiwane nazwij 3 pierwszymi literami imienia (np.: Piotr → Pio).
+- Wielkość zbioru treningowego określ wg reguły: 100% - długość nazwiska+5, dla Kowalski (8 liter+5) będzie to 87%.
+- Zbiór testowy składa się ze wszystkich elementów nie biorących udziału w uczeniu sieci.
