@@ -1,0 +1,233 @@
+import numpy as np
+import numpy.random as npr
+import matplotlib.pyplot as plt
+from statsmodels.distributions.empirical_distribution import ECDF
+
+a = 1
+b = 1
+c = 1
+d = 2
+
+lenpr = 100000
+
+T0 = 0
+T  = 10
+
+t_ls = np.linspace(T0, T, 101)
+
+# ---------- (a) ----------
+U = npr.uniform(0, a, lenpr)
+
+# ---------- (b) ----------
+# U = npr.poisson(1 + a/2, lenpr)
+
+# ---------- (c) ----------
+# U = a + a*npr.randn(lenpr)
+
+# ---------- (d) ----------
+V = npr.uniform(0, b, lenpr)
+
+# ---------- (e) ----------
+# V = npr.poisson(1 + b/2, lenpr)
+
+# ---------- (f) ----------
+# V = b + b*npr.randn(lenpr)
+
+####################################################################
+# FUNKCJA PROCESU
+####################################################################
+
+def generuj_X(t):
+    return c*t*U + d*V
+
+print('\n')
+print('E(Xt)')
+
+EX_ls = []
+
+for t in t_ls:
+    X = generuj_X(t)
+    EX = np.mean(X)
+    EX_ls.append(EX)
+
+print('gotowe')
+
+plt.title('E(Xt)')
+plt.plot(t_ls, EX_ls)
+plt.grid()
+plt.show()
+
+print('\n')
+print('Var(Xt)')
+
+VarX_ls = []
+
+for t in t_ls:
+    X = generuj_X(t)
+    VarX = np.var(X)
+    VarX_ls.append(VarX)
+
+print('gotowe')
+
+plt.title('Var(Xt)')
+plt.plot(t_ls, VarX_ls)
+plt.grid()
+plt.show()
+
+print('\n')
+print('P(min(5ac, bd)/2 <Xt <max(5ac, bd)/2)')
+
+A = min(5*a*c, b*d)/2
+B = max(5*a*c, b*d)/2
+
+print('A =', A)
+print('B =', B)
+
+P_ls = []
+
+for t in t_ls:
+    X = generuj_X(t)
+    P = np.count_nonzero(
+            (X > A) & (X < B)
+        ) / lenpr
+    P_ls.append(P)
+
+plt.title('P(A<Xt<B)')
+plt.plot(t_ls, P_ls)
+plt.grid()
+plt.show()
+
+print('\n')
+print('KX(t,s)')
+
+X_many = np.array(
+    [ generuj_X(t) for t in t_ls ]
+)
+
+def KX(i,j):
+    return np.mean(
+        X_many[i]*X_many[j]
+    ) - np.mean(X_many[i])*np.mean(X_many[j])
+
+K = np.array([
+    [
+        KX(i,j)
+        for j in range(len(t_ls))
+    ]
+    for i in range(len(t_ls))
+])
+
+ax = plt.axes(projection='3d')
+
+tmg, smg = np.meshgrid(t_ls,t_ls)
+
+ax.plot_surface(
+    tmg,
+    smg,
+    K,
+    lw=0.5
+)
+
+ax.set_xlabel('t')
+ax.set_ylabel('s')
+ax.set_zlabel('KX(t,s)')
+
+plt.show()
+
+# DYSTRYBUANTA 1-WYMIAROWA
+
+print('\n')
+print('Dystrybuanta 1D')
+
+t0 = 5
+X = generuj_X(t0)
+F_X = ECDF(X)
+
+x_ls = np.linspace(
+    np.min(X),
+    np.max(X),
+    1000
+)
+
+plt.title('F_X(t=5,x)')
+plt.plot(
+    x_ls,
+    [F_X(x) for x in x_ls]
+)
+plt.grid()
+plt.show()
+
+# DYSTRYBUANTA 2-WYMIAROWA
+
+print('\n')
+print('Dystrybuanta procesu')
+
+x_ls = np.linspace(-50,50,300)
+F_ecdf_ls = np.array(
+
+    [
+        [
+            np.count_nonzero(
+                generuj_X(t) <= x
+            ) / lenpr
+
+            for x in x_ls
+        ]
+
+        for t in t_ls
+    ]
+)
+
+ax = plt.axes(projection='3d')
+
+tmg,xmg = np.meshgrid(
+    t_ls,
+    x_ls
+)
+
+ax.plot_surface(
+    tmg,
+    xmg,
+    F_ecdf_ls.T,
+    lw=0.5
+)
+
+ax.set_xlabel('t')
+ax.set_ylabel('x')
+ax.set_zlabel('F(t,x)')
+
+plt.show()
+
+# # PUNKT (g)
+# # X(t)=c*t*E(U)+d*V
+#
+# print('\n')
+# print('PUNKT (g)')
+#
+# EU = np.mean(U)
+#
+# def X_g(t):
+#
+#     return c*t*EU + d*V
+#
+# X = X_g(5)
+#
+# print('E(X(5)) =', np.mean(X))
+# print('Var(X(5)) =', np.var(X))
+
+
+# PUNKT (i)
+# X(t)=c*t*U+d*E(V)
+
+print('\n')
+print('PUNKT (i)')
+
+EV = np.mean(V)
+
+def X_i(t):
+    return c*t*U + d*EV
+
+X = X_i(5)
+
+print('E(X(5)) =', np.mean(X))
+print('Var(X(5)) =', np.var(X))
