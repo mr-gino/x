@@ -1,0 +1,189 @@
+import numpy as np
+from math import exp, sqrt, pi
+from scipy.stats import poisson, norm
+
+lam = 3
+mi = 3
+a = 2
+b = 3
+c = 3
+d = 5
+e = 1
+f = 4
+g = 4
+i = 1
+j = 3
+h = 2
+k = 2
+m = 3
+n = 3
+p = 2
+q = 3
+
+# (a)
+# intensywność procesu Z
+
+print("(a)")
+
+lambda_Z = lam + mi
+
+print("lambda_Z =", lambda_Z)
+
+# (b)
+# P(Xa=c oraz Xb=d)
+
+# print("\n")
+# print("(b)")
+#
+# if b >= a and d >= c:
+#
+#     p1 = poisson.pmf(c, lam*a)
+#     p2 = poisson.pmf(d-c, lam*(b-a))
+#
+#     wynik = p1*p2
+#
+# else:
+#     wynik = 0
+#
+# print("P(Xa=c , Xb=d) =", wynik)
+
+# (c)
+# P(Xg=g | Xe=f)
+
+print("\n")
+print("(c)")
+
+if g >= e and g >= f:
+    wynik = poisson.pmf(g-f, lam*(g-e))
+else:
+    wynik = 0
+
+print("P(Xg=g | Xe=f) =", wynik)
+
+# (d)
+# P(Xn = p oraz Z(n+1)=q)
+
+print("\n")
+print("(d)")
+
+"""
+Z(n+1)=X(n+1)+2Y(n+1)
+
+sumujemy po wszystkich możliwych wartościach Y
+"""
+
+wynik = 0
+
+for y in range(q+1):
+    if (q-2*y) >= p:
+        pxn = poisson.pmf(p, lam*n)
+        pxinc = poisson.pmf(
+            (q-2*y)-p,
+            lam
+        )
+        py = poisson.pmf(y, mi*(n+1))
+        wynik += pxn*pxinc*py
+
+print("P(Xn=p oraz Z(n+1)=q) =", wynik)
+
+# # (e)
+# # P(Zj=k | Zi=m)
+#
+# print("\n")
+# print("(e)")
+#
+# """
+# Przyrost: Zj-Zi = (Xj-Xi) + 2(Yj-Yi)
+# """
+#
+# wynik = 0
+#
+# roznica = k-m
+#
+# for r in range(abs(roznica)+50):
+#     if roznica-2*r >= 0:
+#         px = poisson.pmf(
+#             roznica-2*r,
+#             lam*(j-i)
+#         )
+#
+#         py = poisson.pmf(
+#             r,
+#             mi*(j-i)
+#         )
+#
+#         wynik += px*py
+#
+# print("P(Zj=k | Zi=m) =", wynik)
+
+# (f)
+# P(Zh=k oraz Zj-Zi=m)
+
+print("\n")
+print("(f)")
+
+wynik = 0
+
+for y1 in range(50):
+    for y2 in range(50):
+        if h >= j:
+            pZh = poisson.pmf(
+                k-2*y1,
+                lam*h
+            ) * poisson.pmf(
+                y1,
+                mi*h
+            )
+
+            pInc = poisson.pmf(
+                m-2*y2,
+                lam*(j-i)
+            ) * poisson.pmf(
+                y2,
+                mi*(j-i)
+            )
+
+            wynik += pZh*pInc
+
+print("P(Zh=k oraz Zj-Zi=m) =", wynik)
+
+# # (g)
+# # P(Xa=c oraz Xb=d)
+# # dla procesu Wienera
+#
+# print("\n")
+# print("(g)")
+#
+# if b == a:
+#     if c == d:
+#         wynik = norm.pdf(c, 0, sqrt(a))
+#     else:
+#         wynik = 0
+# else:
+#     sigma1 = sqrt(a)
+#     sigma2 = sqrt(b-a)
+#
+#     wynik = (
+#         norm.pdf(c, 0, sigma1)
+#         *
+#         norm.pdf(d-c, 0, sigma2)
+#     )
+#
+# print("Wiener:")
+# print("P(Xa=c oraz Xb=d) =", wynik)
+
+# (i)
+# P(Zj=k | Zi=m)
+# dla procesu Wienera
+
+print("\n")
+print("(i)")
+
+wynik = norm.pdf(
+    k,
+    loc=m,
+    scale=sqrt(j-i)
+)
+
+print("Wiener:")
+print("P(Zj=k | Zi=m) =", wynik)
