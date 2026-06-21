@@ -1,0 +1,204 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.distributions.empirical_distribution import ECDF
+from scipy.stats import poisson, norm
+
+X = np.load(f"probka_10.npy")
+
+EX = np.mean(X)
+VarX = np.var(X)
+
+print("E(X) =", EX)
+print("Var(X) =", VarX)
+
+# 1a F_X oraz f_X
+F_X = ECDF(X)
+x_ls = np.linspace(min(X), max(X), 2000)
+F_ls = np.array([F_X(x) for x in x_ls])
+f_ls = np.gradient(F_ls, x_ls)
+f_ls = np.where(f_ls < 0, 0, f_ls)
+
+plt.figure()
+plt.plot(F_X.x, F_X.y)
+plt.title("Dystrybuanta empiryczna F_X")
+plt.grid()
+plt.show()
+
+plt.figure()
+plt.plot(x_ls, f_ls)
+plt.title("Gestosc f_X")
+plt.grid()
+plt.show()
+
+# 1b Cov(X,Y) ~ 1
+Y = X + 0.01*np.random.randn(len(X))
+
+print("\n1a   Cov~1")
+print("E(X) =", np.mean(X))
+print("E(Y) =", np.mean(Y))
+print("Var(X) =", np.var(X))
+print("Var(Y) =", np.var(Y))
+print("Cov(X,Y) =", np.cov(X,Y)[0,1])
+
+px = np.mean(
+    X < min(X)+(np.mean(X)-min(X))/2
+)
+
+py = np.mean(
+    Y < min(Y)+(np.mean(Y)-min(Y))/2
+)
+
+print("P(X<...) =", px)
+print("P(Y<...) =", py)
+
+# 1b Cov(X,Y) ~ 0
+Y = np.random.choice(X, len(X), replace=True)
+
+print("\n1b   Cov~0")
+print("E(X) =", np.mean(X))
+print("E(Y) =", np.mean(Y))
+print("Var(X) =", np.var(X))
+print("Var(Y) =", np.var(Y))
+print("Cov(X,Y) =", np.cov(X,Y)[0,1])
+
+px = np.mean(
+    X < min(X)+(np.mean(X)-min(X))/2
+)
+
+py = np.mean(
+    Y < min(Y)+(np.mean(Y)-min(Y))/2
+)
+
+print("P(X<...) =", px)
+print("P(Y<...) =", py)
+
+###########################################################
+# 2a, 2b, 2c, 2d
+###########################################################
+
+dt = 0.1
+t_ls = np.arange(0.1, 2.1, dt)
+
+PY = []
+
+for t in t_ls:
+    # 2a
+    # EY = EX*t
+    # VarY = VarX*t*t/4
+
+    # 2b
+    # EY = EX*t/2
+    # VarY = VarX*t*t
+
+    # 2c
+    # EY = 2*EX/t
+    # VarY = 4*VarX*t*t
+
+    # 2d
+    EY = 2*EX*t
+    VarY = VarX*t*t/4
+
+    Yt = EY + np.sqrt(VarY)*np.random.randn(len(X))
+
+    PY.append(
+        np.mean(
+            Yt < (EX-min(X))/2
+        )
+    )
+
+t = 1
+
+# 2a
+# EY = EX
+# VarY = VarX/4
+
+# 2b
+# EY = EX/2
+# VarY = VarX
+
+# 2c
+EY = 2*EX
+VarY = 4*VarX
+
+# 2d
+# EY = 2*EX
+# VarY = VarX/4
+
+Y1 = EY + np.sqrt(VarY)*np.random.randn(len(X))
+
+print("2")
+print("E(X) =", np.mean(X))
+print("E(Y1) =", np.mean(Y1))
+
+print("Var(X) =", np.var(X))
+print("Var(Y1) =", np.var(Y1))
+
+print("Cov(X,Y1) =", np.cov(X,Y1)[0,1])
+
+PX = np.mean(
+    X < min(X)+(EX-min(X))/2
+)
+
+plt.plot(
+    t_ls,
+    PX*np.ones(len(t_ls)),
+    label="P(X)"
+)
+
+plt.plot(
+    t_ls,
+    PY,
+    label="P(Yt)"
+)
+
+plt.grid()
+plt.legend()
+plt.show()
+
+# 3a a=3 zdarzeń w przedziale czasowym (2,6] i b=2 zdarzeń - w (5,9]
+lam = 1
+a = 3
+b = 2
+
+P1 = poisson.pmf(a, lam*(6-2))
+P2 = poisson.pmf(b, lam*(9-5))
+
+print("\n3a")
+print("P(Z(6)-Z(2)=3) =", P1)
+print("P(Z(9)-Z(5)=2) =", P2)
+
+# 3b
+lam = 1      # <-- intensywność
+
+t1 = 2       # <-- wcześniejsza chwila
+t2 = 3       # <-- późniejsza chwila
+
+k = 2        # <-- Z_t1 = k
+n = 3        # <-- Z_t2 = n
+
+P = (
+    poisson.pmf(k, lam*t1)
+    *
+    poisson.pmf(n-k, lam*(t2-t1))
+    /
+    poisson.pmf(n, lam*t2)
+)
+
+print("\n3b")
+print(f"P(Z{t1}={k} | Z{t2}={n}) =", P)
+
+# 4a
+P = norm.cdf(
+    5/np.sqrt(2)
+) - norm.cdf(
+    3/np.sqrt(2)
+)
+
+print("\n4a")
+print(P)
+
+# 4b
+P = norm.cdf((1-3))
+
+print("\n4b")
+print(P)
